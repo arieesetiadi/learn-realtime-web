@@ -1,0 +1,23 @@
+import { z } from "zod";
+
+const passwordSchema = z.string();
+
+export const loginSchema = z.object({
+  email: z.string().email("Enter a valid email address."),
+  password: z.string().min(1, "Password is required."),
+});
+
+export const registerSchema = z
+  .object({
+    name: z.string().trim().min(1, "Name is required."),
+    email: z.string().email("Enter a valid email address."),
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Confirm your password."),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
+export type LoginInput = z.infer<typeof loginSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
